@@ -1,12 +1,17 @@
 package com.beoks.jarvis
 
 class Jarvis(
+    private val reasoner: Reasoner,
     private val strategist: Strategist,
     private val abilityProvider: AbilityProvider,
-) : Strategist by strategist,
+) : Reasoner by reasoner,
+    Strategist by strategist,
     AbilityProvider by abilityProvider {
 
     fun execute(command: String): CharSequence {
-        TODO("Not yet implemented")
+        abilityProvider.getAbility(command).apply {
+            return if(isEmpty())  reasoner.reason(command)
+            else strategist.plan(this, command).execute()
+        }
     }
 }
