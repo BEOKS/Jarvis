@@ -53,7 +53,6 @@ class GabiaProxyOpenAiTextGenerator : TextGenerator {
         val index: Int,
         val message: MessageContent,
         @SerialName("finish_reason") val finishReason: String? = null,
-        val logprobs: JsonElement? = null
     )
 
     @Serializable
