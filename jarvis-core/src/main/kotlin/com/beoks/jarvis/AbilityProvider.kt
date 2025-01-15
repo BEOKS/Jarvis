@@ -18,5 +18,5 @@ interface AbilityProvider{
      * @param command The command to retrieve the ability from.
      * @return The ability from the command.
      */
-    fun getAbility(command: String): List<Ability> = abilities.filter { it.isAbilityAvailable(command) }
+    fun getAbility(command: String): List<Ability>
 }

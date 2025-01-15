@@ -9,9 +9,6 @@ class Jarvis(
     AbilityProvider by abilityProvider {
 
     fun execute(command: String): CharSequence {
-        abilityProvider.getAbility(command).apply {
-            return if(isEmpty())  reasoner.reason(command)
-            else strategist.plan(this, command).execute()
-        }
+        return ""
     }
 }
