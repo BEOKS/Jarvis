@@ -1,22 +1,35 @@
+
+
 import com.beoks.jarvis.TextGenerator
 
-import okhttp3.*
-import java.io.IOException
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.contentnegotiation.*
+
+import io.ktor.client.request.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody.Companion.toRequestBody
 
 /**
  * ProxyOpenAiTextGenerator is a class that generates text using the OpenAI API.
  * It uses a proxy server to bypass the OpenAI API's rate limiting.
- * It cans use only in gabia office network.
+ * It can be used only in Gabia office network.
  */
 class GabiaProxyOpenAiTextGenerator : TextGenerator {
 
-    private val client = OkHttpClient()
+    private val client = HttpClient(CIO) {
+        install(ContentNegotiation) {
+            json(
+                Json{
+                    ignoreUnknownKeys = true
+                }
+            )
+        }
+    }
     private val url = "https://dev-openai-proxy.gabia.app/v1/chat/completions"
-    private val json = Json { ignoreUnknownKeys = true }
 
     @Serializable
     data class Message(
@@ -50,40 +63,31 @@ class GabiaProxyOpenAiTextGenerator : TextGenerator {
         val refusal: String? = null
     )
 
-    override fun generate(ask: String): String {
-        val requestBody = ChatRequest(
-            model = "gpt-4",
-            messages = listOf(
-                Message(
-                    role = "system",
-                    content = "You are a helpful assistant."
-                ),
-                Message(
-                    role = "user",
-                    content = ask
+    override suspend fun generate(ask: String): String {
+
+        val chatResponse: ChatResponse = client.post(url) {
+            contentType(ContentType.Application.Json)
+            setBody(
+                ChatRequest(
+                    model = "gpt-4",
+                    messages = listOf(
+                        Message(
+                            role = "system",
+                            content = "You are a helpful assistant."
+                        ),
+                        Message(
+                            role = "user",
+                            content = ask
+                        )
+                    )
                 )
             )
-        )
+        }.body()
 
-        val jsonString = json.encodeToString(requestBody)
-
-        val body = jsonString.toRequestBody("application/json".toMediaTypeOrNull())
-
-        val request = Request.Builder()
-            .url(url)
-            .post(body)
-            .build()
-
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw IOException("Unexpected code $response")
-
-            val responseData = response.body?.string() ?: ""
-            val chatResponse = json.decodeFromString<ChatResponse>(responseData)
-
-            return chatResponse.choices.firstOrNull()?.message?.content ?: ""
-        }
+        return chatResponse.choices.firstOrNull()?.message?.content ?: ""
     }
 }
+
 
 
 
