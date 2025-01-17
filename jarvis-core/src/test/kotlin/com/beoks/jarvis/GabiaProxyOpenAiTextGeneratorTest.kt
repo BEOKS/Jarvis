@@ -1,6 +1,5 @@
 package com.beoks.jarvis
 
-import com.beoks.jarvis.processor.GabiaProxyOpenAiTextGenerator
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test

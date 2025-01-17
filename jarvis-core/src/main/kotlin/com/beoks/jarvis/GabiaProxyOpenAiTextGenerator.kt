@@ -1,4 +1,4 @@
-package com.beoks.jarvis.processor
+package com.beoks.jarvis
 
 import io.ktor.client.*
 import io.ktor.client.call.*

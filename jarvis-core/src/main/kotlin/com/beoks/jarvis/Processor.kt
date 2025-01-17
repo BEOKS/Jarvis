@@ -1,4 +1,4 @@
-package com.beoks.jarvis.processor
+package com.beoks.jarvis
 
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
