@@ -16,7 +16,11 @@ import kotlinx.serialization.json.Json
  * It uses a proxy server to bypass the OpenAI API's rate limiting.
  * It can be used only in Gabia office network.
  */
-class GabiaProxyOpenAiTextGenerator : TextGenerator {
+class OpenAiTextGenerator(
+    private val model: String = "gpt-4",
+    private val systemMessage: String = "You are a helpful assistant.",
+    private val openAiBaseUrl: String = "https://dev-openai-proxy.gabia.app/v1/chat/completions"
+) : TextGenerator {
 
     private val client = HttpClient(CIO) {
         install(ContentNegotiation) {
@@ -27,7 +31,6 @@ class GabiaProxyOpenAiTextGenerator : TextGenerator {
             )
         }
     }
-    private val url = "https://dev-openai-proxy.gabia.app/v1/chat/completions"
 
     @Serializable
     data class Message(
@@ -62,15 +65,15 @@ class GabiaProxyOpenAiTextGenerator : TextGenerator {
 
     override suspend fun generate(ask: String): String {
 
-        val chatResponse: ChatResponse = client.post(url) {
+        val chatResponse: ChatResponse = client.post(openAiBaseUrl) {
             contentType(ContentType.Application.Json)
             setBody(
                 ChatRequest(
-                    model = "gpt-4",
+                    model = model,
                     messages = listOf(
                         Message(
                             role = "system",
-                            content = "You are a helpful assistant."
+                            content = systemMessage
                         ),
                         Message(
                             role = "user",
