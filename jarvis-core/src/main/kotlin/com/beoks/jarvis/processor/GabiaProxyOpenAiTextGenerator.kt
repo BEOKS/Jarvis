@@ -1,17 +1,15 @@
-
-
-import com.beoks.jarvis.TextGenerator
+package com.beoks.jarvis.processor
 
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
-
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 /**
  * ProxyOpenAiTextGenerator is a class that generates text using the OpenAI API.
@@ -23,7 +21,7 @@ class GabiaProxyOpenAiTextGenerator : TextGenerator {
     private val client = HttpClient(CIO) {
         install(ContentNegotiation) {
             json(
-                Json{
+                Json {
                     ignoreUnknownKeys = true
                 }
             )
@@ -85,6 +83,9 @@ class GabiaProxyOpenAiTextGenerator : TextGenerator {
 
         return chatResponse.choices.firstOrNull()?.message?.content ?: ""
     }
+
+    override suspend fun process(input: String): String = generate(input)
+
 }
 
 

@@ -1,5 +1,7 @@
 package com.beoks.jarvis
 
+import com.beoks.jarvis.processor.Reasoner
+
 class Jarvis(
     private val reasoner: Reasoner,
     private val strategist: Strategist,
