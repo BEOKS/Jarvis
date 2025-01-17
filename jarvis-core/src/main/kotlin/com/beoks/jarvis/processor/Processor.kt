@@ -1,7 +1,6 @@
-package com.beoks.jarvis
+package com.beoks.jarvis.processor
 
 interface Processor<I, O> {
-    val type: String get() = this::class.simpleName ?: "None"
     fun process(input: I): O
 }
 
@@ -12,15 +11,19 @@ interface Pipeline<T> : Workflow<T, T> {
     override fun process(input: T): T = processor.fold(input) { acc, processor -> processor.process(acc) }
 }
 
+typealias Selector<I, O> = (List<Processor<I, O>>) -> Processor<I, O>
+
 interface Router<I, O> : Workflow<I, O> {
     val processor: List<Processor<I, O>>
-    val selector: (List<Processor<I, O>>) -> Processor<I, O>
+    val selector: Selector<I, O>
     override fun process(input: I): O = selector(processor).process(input)
 }
 
+typealias Condition<O> = (O) -> Boolean
+
 interface Repeater<I, O> : Workflow<I, O> {
     val processor: Processor<I, O>
-    val condition: (O) -> Boolean
+    val condition: Condition<O>
     override fun process(input: I): O {
         var output: O;
         do {
@@ -30,10 +33,13 @@ interface Repeater<I, O> : Workflow<I, O> {
     }
 }
 
+typealias Divider<I> = (I) -> List<I>
+typealias Aggregator<O> = (List<O>) -> O
+
 interface BatchProcessor<I, O> : Workflow<I, O> {
     val processor: List<Processor<I, O>>
-    val divider: (I) -> List<I>
-    val aggregator: (List<O>) -> O
+    val divider: Divider<I>
+    val aggregator: Aggregator<O>
     override fun process(input: I): O {
         return divider(input).zip(processor)
             .map { (input, processor) -> processor.process(input) }
