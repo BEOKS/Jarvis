@@ -1,7 +1,7 @@
 package com.beoks.jarvis
 
 interface Strategy {
-    fun execute(): CharSequence {
+    fun execute(): CharPipeline {
         TODO("Not yet implemented")
     }
 

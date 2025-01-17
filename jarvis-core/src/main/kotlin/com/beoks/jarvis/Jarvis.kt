@@ -8,7 +8,7 @@ class Jarvis(
     Strategist by strategist,
     AbilityProvider by abilityProvider {
 
-    fun execute(command: String): CharSequence {
+    fun execute(command: String): CharPipeline {
         return ""
     }
 }
